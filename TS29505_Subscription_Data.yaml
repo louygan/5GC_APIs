@@ -2,10 +2,14 @@ openapi: 3.0.0
 info:
   version: '-'
   title: 'Unified Data Repository Service API file for subscription data'
-  description: 'The API version is defined in 3GPP TS 29.504'
-  
+  description: |
+    Unified Data Repository Service (subscription data).
+    The API version is defined in 3GPP TS 29.504.
+    © 2020, 3GPP Organizational Partners (ARIB, ATIS, CCSA, ETSI, TSDSI, TTA, TTC).
+    All rights reserved.
+
 externalDocs:
-  description: 3GPP TS 29.505 Unified Data Repository Service API file for subscription data, version 15.2.0
+  description: 3GPP TS 29.505 V17.1.0; 5G System; Usage of the Unified Data Repository Service for subscription data; Stage 3
   url: 'http://www.3gpp.org/ftp/Specs/archive/29_series/29.505/'
 
 paths:
@@ -16,18 +20,25 @@ paths:
       operationId: QueryAuthSubsData
       tags:
         - Authentication Data (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data:authentication-subscription:read
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
         - name: supported-features
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
       responses:
         '200':
           description: Expected response to a valid request
@@ -36,30 +47,39 @@ paths:
               schema:
                 $ref: '#/components/schemas/AuthenticationSubscription'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'                
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     patch:
       summary: modify the authentication subscription data of a UE
-      operationId: ModifyAuthentication
+      operationId: ModifyAuthenticationSubscription
       tags:
-        - Authentication Data (Document)
+        - Authentication Subscription (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data:authentication-subscription:modify
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
+        - name: supported-features
+          in: query
+          description: Features required to be supported by the target NF
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
       requestBody:
         content:
           application/json-patch+json:
             schema:
               type: array
               items:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/PatchItem'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchItem'
         required: true
       responses:
         '204':
@@ -69,54 +89,66 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
-        default:
-          description: Unexpected error
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+        '200':
+          description: Expected response to a valid request
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchResult'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
 
-  /subscription-data/{ueId}/authentication-data/authentication-status: 
+  /subscription-data/{ueId}/authentication-data/authentication-status:
     put:
-      summary: To store the Authentication Status data of a UE 
+      summary: To store the Authentication Status data of a UE
       operationId: CreateAuthenticationStatus
       tags:
         - Authentication Status (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_UEAU.yaml#/components/schemas/AuthEvent'
-      responses:  
+              $ref: 'TS29503_Nudm_UEAU.yaml#/components/schemas/AuthEvent'
+      responses:
         '204':
           description: Upon success, an empty response body shall be returned
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
 
     get:
       summary: Retrieves the Authentication Status of a UE
       operationId: QueryAuthenticationStatus
       tags:
         - AuthEvent (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
         - name: fields
           in: query
           description: attributes to be retrieved
@@ -128,74 +160,225 @@ paths:
             minItems: 1
           style: form
           explode: false
-        - name: supportedFeatures
+        - name: supported-features
           description: Supported Features
           in: query
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
       responses:
         '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_UEAU.yaml#/components/schemas/AuthEvent'
+                $ref: 'TS29503_Nudm_UEAU.yaml#/components/schemas/AuthEvent'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
 
-  /subscription-data/{ueId}/ue-update-confirmation-data/sor-data:
-    put:
-      summary: To store the SoR acknowledgement information of a UE 
-      operationId: CreateAuthenticationSoR
+    delete:
+      summary: To remove the Authentication Status of a UE
+      operationId: DeleteAuthenticationStatus
       tags:
-        - Authentication SoR (Document)
+        - AuthEvent (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
-        - name: supported-features 
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
+      responses:
+        '204':
+          description: Upon success, an empty response body shall be returned.
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/{ueId}/authentication-data/authentication-status/{servingNetworkName}:
+    put:
+      summary: To store the individual Authentication Status data of a UE
+      operationId: CreateIndividualAuthenticationStatus
+      tags:
+        - Individual Authentication Status (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
+        - name: servingNetworkName
+          in: path
+          description: Serving Network Name
+          required: true
+          schema:
+            $ref: 'TS29503_Nudm_UEAU.yaml#/components/schemas/ServingNetworkName'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'TS29503_Nudm_UEAU.yaml#/components/schemas/AuthEvent'
+      responses:
+        '204':
+          description: Upon success, an empty response body shall be returned
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    get:
+      summary: Retrieves the Individual Authentication Status of a UE
+      operationId: QueryIndividualAuthenticationStatus
+      tags:
+        - Individual AuthEvent (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
+        - name: servingNetworkName
+          in: path
+          description: Serving Network Name
+          required: true
+          schema:
+            $ref: 'TS29503_Nudm_UEAU.yaml#/components/schemas/ServingNetworkName'
+        - name: fields
+          in: query
+          description: attributes to be retrieved
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            minItems: 1
+          style: form
+          explode: false
+        - name: supported-features
+          description: Supported Features
+          in: query
+          schema:
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: 'TS29503_Nudm_UEAU.yaml#/components/schemas/AuthEvent'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    delete:
+      summary: To remove the Individual Authentication Status of a UE
+      operationId: DeleteIndividualAuthenticationStatus
+      tags:
+        - Individual AuthEvent (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
+        - name: servingNetworkName
+          in: path
+          description: Serving Network Name
+          required: true
+          schema:
+            $ref: 'TS29503_Nudm_UEAU.yaml#/components/schemas/ServingNetworkName'
+      responses:
+        '204':
+          description: Upon success, an empty response body shall be returned.
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/{ueId}/ue-update-confirmation-data/sor-data:
+    put:
+      summary: To store the SoR acknowledgement information of a UE
+      operationId: CreateAuthenticationSoR
+      tags:
+        - Authentication SoR (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
+        - name: supported-features
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/SorData'
-      responses:  
+      responses:
         '204':
           description: Expected response to a valid request
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     get:
       summary: Retrieves the SoR acknowledgement information of a UE
       operationId: QueryAuthSoR
       tags:
         - Authentication SoR (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
         - name: supportedFeatures
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
       responses:
         '200':
           description: Expected response to a valid request
@@ -204,11 +387,217 @@ paths:
               schema:
                 $ref: '#/components/schemas/SorData'
         default:
-          description: Unexpected error
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/{ueId}/ue-update-confirmation-data/upu-data:
+    put:
+      summary: To store the UPU acknowledgement information of a UE
+      operationId: CreateAuthenticationUPU
+      tags:
+        - Authentication UPU (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
+        - name: supported-features
+          in: query
+          description: Supported Features
+          schema:
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpuData'
+      responses:
+        '204':
+          description: Expected response to a valid request
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    get:
+      summary: Retrieves the UPU acknowledgement information of a UE
+      operationId: QueryAuthUPU
+      tags:
+        - Authentication UPU (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
+        - name: supportedFeatures
+          in: query
+          description: Supported Features
+          schema:
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      responses:
+        '200':
+          description: Expected response to a valid request
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                $ref: '#/components/schemas/UpuData'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/{ueId}/ue-update-confirmation-data/subscribed-snssais:
+    put:
+      summary: To store the NSSAI update acknowledgement information of a UE
+      operationId: Create NSSAI update ack
+      tags:
+        - NSSAI update ack (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
+        - name: supported-features
+          in: query
+          description: Supported Features
+          schema:
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NssaiAckData'
+      responses:
+        '204':
+          description: Expected response to a valid request
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    get:
+      summary: Retrieves the UPU acknowledgement information of a UE
+      operationId: QueryNssaiAck
+      tags:
+        - NSSAI ACK (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
+        - name: supportedFeatures
+          in: query
+          description: Supported Features
+          schema:
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NssaiAckData'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/{ueId}/ue-update-confirmation-data/subscribed-cag:
+    put:
+      summary: To store the CAG update acknowledgement information of a UE
+      operationId: CreateCagUpdateAck
+      tags:
+        - CAG update ack (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
+        - name: supported-features
+          in: query
+          description: Supported Features
+          schema:
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CagAckData'
+      responses:
+        '204':
+          description: Expected response to a valid request
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    get:
+      summary: Retrieves the CAG acknowledgement information of a UE
+      operationId: QueryCagAck
+      tags:
+        - CAG ACK (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
+        - name: supported-features
+          in: query
+          description: Supported Features
+          schema:
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CagAckData'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
 
   /subscription-data/{ueId}/{servingPlmnId}/provisioned-data:
     get:
@@ -216,13 +605,20 @@ paths:
       operationId: QueryProvisionedData
       tags:
         - Provisioned Data (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: servingPlmnId
           in: path
           description: PLMN ID
@@ -232,6 +628,8 @@ paths:
         - name: dataset-names
           in: query
           description: List of dataset names
+          style: form
+          explode: false
           schema:
             $ref: '#/components/schemas/DatasetNames'
       responses:
@@ -242,26 +640,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProvisionedDataSets'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
 
-                
   /subscription-data/{ueId}/{servingPlmnId}/provisioned-data/am-data:
     get:
       summary: Retrieves the access and mobility subscription data of a UE
       operationId: QueryAmData
       tags:
         - Access And Mobility Subscription Data (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: servingPlmnId
           in: path
           description: PLMN ID
@@ -283,7 +683,7 @@ paths:
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
         - name: If-None-Match
           in: header
           description: Validator for conditional requests, as described in RFC 7232, 3.2
@@ -315,25 +715,28 @@ paths:
               schema:
                 type: string
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
-                
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
   /subscription-data/{ueId}/{servingPlmnId}/provisioned-data/smf-selection-subscription-data:
     get:
       summary: Retrieves the SMF selection subscription data of a UE
       operationId: QuerySmfSelectData
       tags:
         - SMF Selection Subscription Data (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: servingPlmnId
           in: path
           description: PLMN ID
@@ -355,7 +758,7 @@ paths:
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
         - name: If-None-Match
           in: header
           description: Validator for conditional requests, as described in RFC 7232, 3.2
@@ -387,25 +790,28 @@ paths:
               schema:
                 type: string
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
-                
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
   /subscription-data/{ueId}/{servingPlmnId}/provisioned-data/sm-data:
     get:
       summary: Retrieves the Session Management subscription data of a UE
       operationId: QuerySmData
       tags:
         - Session Management Subscription Data
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: servingPlmnId
           in: path
           description: PLMN ID
@@ -441,7 +847,7 @@ paths:
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
         - name: If-None-Match
           in: header
           description: Validator for conditional requests, as described in RFC 7232, 3.2
@@ -476,25 +882,28 @@ paths:
               schema:
                 type: string
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
-                
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
   /subscription-data/{ueId}/context-data/amf-3gpp-access:
     get:
       summary: Retrieves the AMF context data of a UE using 3gpp access
       operationId: QueryAmfContext3gpp
       tags:
         - AMF 3GPP Access Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: fields
           in: query
           description: attributes to be retrieved
@@ -510,8 +919,8 @@ paths:
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
-      responses:  
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      responses:
         '200':
           description: Expected response to a valid request
           content:
@@ -519,86 +928,126 @@ paths:
               schema:
                 $ref: '#/components/schemas/Amf3GppAccessRegistration'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     put:
       summary: To store the AMF context data of a UE using 3gpp access in the UDR
       operationId: CreateAmfContext3gpp
       tags:
         - AMF 3GPP Access Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data:registrations:write
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Amf3GppAccessRegistration'
-      responses:  
+      responses:
         '204':
           description: Upon success, an empty response body shall be returned
-        default:
-          description: Unexpected error
+        '201':
+          description: Created
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                $ref: '#/components/schemas/Amf3GppAccessRegistration'
+          headers:
+            Location:
+              description: 'Contains the URI of the newly created resource, according to the structure: {apiRoot}/nudr-dr/<apiVersion>/subscription-data/{ueId}/context-data/amf-3gpp-access'
+              required: true
+              schema:
+                type: string
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     patch:
       summary: To modify the AMF context data of a UE using 3gpp access in the UDR
       operationId: AmfContext3gpp
       tags:
         - AMF 3GPP Access Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data:registrations:write
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: supported-features
+          in: query
+          description: Features required to be supported by the target NF
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
       requestBody:
         content:
           application/json-patch+json:
             schema:
               type: array
               items:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/PatchItem'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchItem'
         required: true
       responses:
         '204':
           description: Expected response to a valid request
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchResult'
         '403':
           description: modification is rejected
           content:
             application/problem+json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
-                
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
   /subscription-data/{ueId}/context-data/amf-non-3gpp-access:
     get:
       summary: Retrieves the AMF context data of a UE using non-3gpp access
       operationId: QueryAmfContextNon3gpp
       tags:
         - AMF Non-3GPP Access Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: fields
           in: query
           description: attributes to be retrieved
@@ -614,8 +1063,8 @@ paths:
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
-      responses:  
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      responses:
         '200':
           description: Expected response to a valid request
           content:
@@ -623,91 +1072,131 @@ paths:
               schema:
                 $ref: '#/components/schemas/AmfNon3GppAccessRegistration'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     put:
       summary: To store the AMF context data of a UE using non-3gpp access in the UDR
       operationId: CreateAmfContextNon3gpp
       tags:
         - AMF Non-3GPP Access Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data:registrations:write
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/AmfNon3GppAccessRegistration'
-      responses:  
+      responses:
         '204':
           description: Upon success, an empty response body shall be returned
-        default:
-          description: Unexpected error
+        '201':
+          description: Created
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                $ref: '#/components/schemas/Amf3GppAccessRegistration'
+          headers:
+            Location:
+              description: 'Contains the URI of the newly created resource, according to the structure: {apiRoot}/nudr-dr/<apiVersion>/subscription-data/{ueId}/context-data/amf-non-3gpp-access'
+              required: true
+              schema:
+                type: string
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     patch:
       summary: To modify the AMF context data of a UE using non 3gpp access in the UDR
       operationId: AmfContextNon3gpp
       tags:
         - AMF Non-3GPP Access Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data:registrations:write
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: supported-features
+          in: query
+          description: Features required to be supported by the target NF
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
       requestBody:
         content:
           application/json-patch+json:
             schema:
               type: array
               items:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/PatchItem'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchItem'
         required: true
       responses:
         '204':
           description: Expected response to a valid request
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchResult'
         '403':
           description: modification is rejected
           content:
             application/problem+json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
-                
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
   /subscription-data/{ueId}/context-data/smf-registrations:
     get:
       summary: Retrieves the SMF registration list of a UE
       operationId: QuerySmfRegList
       tags:
         - SMF Registrations (Collection)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: supported-features
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
       responses:
         '200':
           description: Expected response to a valid request
@@ -716,31 +1205,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/SmfRegList'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
-                
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
   /subscription-data/{ueId}/context-data/smf-registrations/{pduSessionId}:
     get:
-      summary: Retrieves the individual SMF registration of a UE 
+      summary: Retrieves the individual SMF registration of a UE
       operationId: QuerySmfRegistration
       tags:
         - SMF Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: pduSessionId
           in: path
           description: PDU session id
           required: true
           schema:
-            type: string
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/PduSessionId'
         - name: fields
           in: query
           description: attributes to be retrieved
@@ -756,8 +1248,8 @@ paths:
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
-      responses:  
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      responses:
         '200':
           description: Expected response to a valid request
           content:
@@ -765,90 +1257,113 @@ paths:
               schema:
                 $ref: '#/components/schemas/SmfRegistration'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     put:
       summary: To create an individual SMF context data of a UE in the UDR
       operationId: CreateSmfContextNon3gpp
       tags:
         - SMF Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data:registrations:write
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: pduSessionId
           in: path
           description: PDU session id
           required: true
           schema:
-            type: integer
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/PduSessionId'
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/SmfRegistration'
-      responses:  
+      responses:
         '201':
           description: Upon success, a response body containing a representation of the created Individual SmfRegistration resource shall be returned
-        default:
-          description: Unexpected error
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                $ref: '#/components/schemas/SmfRegistration'
           headers:
             Location:
-              description: 'Contains the URI of the newly created resource, according to the structure: {apiRoot}/nsmf-pdusession/v1/sm-contexts/{smContextRef}/subscription-data/{ueId}/context-data/smf-registrations/{pduSessionId}'
+              description: 'Contains the URI of the newly created resource, according to the structure: {apiRoot}/nudr-dr/<apiVersion>/subscription-data/{ueId}/context-data/smf-registrations/{pduSessionId}'
               required: true
               schema:
                 type: string
+        '204':
+          description: No content
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     delete:
       summary: To remove an individual SMF context data of a UE the UDR
       operationId: DeleteSmfContext
       tags:
         - SMF Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data:registrations:write
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: pduSessionId
           in: path
           description: PDU session id
           required: true
           schema:
-            type: string
-      responses:  
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/PduSessionId'
+      responses:
         '204':
           description: Upon success, an empty response body shall be returned.
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
-                
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
   /subscription-data/{ueId}/operator-specific-data:
     get:
-      summary: Retrieves the operator specific data of a UE 
+      summary: Retrieves the operator specific data of a UE
       operationId: QueryOperSpecData
       tags:
         - Operator-Specific Data Container (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: fields
           in: query
           description: attributes to be retrieved
@@ -864,7 +1379,7 @@ paths:
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
         - name: If-None-Match
           in: header
           description: Validator for conditional requests, as described in RFC 7232, 3.2
@@ -875,13 +1390,15 @@ paths:
           description: Validator for conditional requests, as described in RFC 7232, 3.3
           schema:
             type: string
-      responses:  
+      responses:
         '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OperatorSpecificDataContainer'
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/OperatorSpecificDataContainer'
           headers:
             Cache-Control:
               description: Cache-Control containing max-age, as described in RFC 7234, 5.2
@@ -896,107 +1413,151 @@ paths:
               schema:
                 type: string
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     patch:
       summary: To modify operator specific data of a UE
-      operationId: AmfContext3gpp
+      operationId: ModifyOperSpecData
       tags:
         - Operator-Specific Data Container (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: supported-features
+          in: query
+          description: Features required to be supported by the target NF
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
       requestBody:
         content:
           application/json-patch+json:
             schema:
               type: array
               items:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/PatchItem'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchItem'
         required: true
       responses:
         '204':
           description: Expected response to a valid request
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchResult'
         '403':
           description: modification is rejected
           content:
             application/problem+json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
-                
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
   /subscription-data/{ueId}/context-data/smsf-3gpp-access:
     put:
-      summary: Create the SMSF context data of a UE via 3GPP access 
+      summary: Create the SMSF context data of a UE via 3GPP access
       operationId: CreateSmsfContext3gpp
       tags:
         - SMSF 3GPP Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data:registrations:write
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/SmsfRegistration'
-      responses:  
+      responses:
         '204':
           description: Upon success, an empty response body shall be returned
-        default:
-          description: Unexpected error
+        '201':
+          description: Created
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                $ref: '#/components/schemas/SmsfRegistration'
+          headers:
+            Location:
+              description: 'Contains the URI of the newly created resource, according to the structure: {apiRoot}/nudr-dr/<apiVersion>/subscription-data/{ueId}/context-data/smsf-3gpp-access'
+              required: true
+              schema:
+                type: string
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     delete:
-      summary: To remove the SMSF context data of a UE via 3GPP access 
+      summary: To remove the SMSF context data of a UE via 3GPP access
       operationId: DeleteSmsfContext3gpp
       tags:
         - SMSF 3GPP Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data:registrations:write
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
-      responses:  
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+      responses:
         '204':
           description: Upon success, an empty response body shall be returned
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     get:
       summary: Retrieves the SMSF context data of a UE using 3gpp access
       operationId: QuerySmsfContext3gpp
       tags:
         - SMSF 3GPP Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: fields
           in: query
           description: attributes to be retrieved
@@ -1012,8 +1573,8 @@ paths:
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
-      responses:  
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      responses:
         '200':
           description: Expected response to a valid request
           content:
@@ -1021,72 +1582,101 @@ paths:
               schema:
                 $ref: '#/components/schemas/SmsfRegistration'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
-                
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
   /subscription-data/{ueId}/context-data/smsf-non-3gpp-access:
     put:
-      summary: Create the SMSF context data of a UE via non-3GPP access 
+      summary: Create the SMSF context data of a UE via non-3GPP access
       operationId: CreateSmsfContextNon3gpp
       tags:
         - SMSF Non-3GPP Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data:registrations:write
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/SmsfRegistration'
-      responses:  
+      responses:
         '204':
           description: Upon success, an empty response body shall be returned
-        default:
-          description: Unexpected error
+        '201':
+          description: Created
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                $ref: '#/components/schemas/SmsfRegistration'
+          headers:
+            Location:
+              description: 'Contains the URI of the newly created resource, according to the structure: {apiRoot}/nudr-dr/<apiVersion>/subscription-data/{ueId}/context-data/smsf-non-3gpp-access'
+              required: true
+              schema:
+                type: string
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     delete:
-      summary: To remove the SMSF context data of a UE via non-3GPP access 
+      summary: To remove the SMSF context data of a UE via non-3GPP access
       operationId: DeleteSmsfContextNon3gpp
       tags:
         - SMSF Non-3GPP Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data:registrations:write
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
-      responses:  
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+      responses:
         '204':
           description: Upon success, an empty response body shall be returned
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     get:
       summary: Retrieves the SMSF context data of a UE using non-3gpp access
       operationId: QuerySmsfContextNon3gpp
       tags:
         - SMSF Non-3GPP Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: fields
           in: query
           description: attributes to be retrieved
@@ -1102,8 +1692,8 @@ paths:
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
-      responses:  
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      responses:
         '200':
           description: Expected response to a valid request
           content:
@@ -1111,25 +1701,314 @@ paths:
               schema:
                 $ref: '#/components/schemas/SmsfRegistration'
         default:
-          description: Unexpected error
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/{ueId}/context-data/ip-sm-gw:
+    put:
+      summary: Create the IP-SM-GW context data of a UE
+      operationId: CreateIpSmGwContext
+      tags:
+        - IP-SM-GW Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data:registrations:write
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IpSmGwRegistration'
+      responses:
+        '204':
+          description: Upon success, an empty response body shall be returned
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    delete:
+      summary: To remove the IP-SM-GW context data of a UE
+      operationId: DeleteIpSmGwContext
+      tags:
+        - IP-SM-GW Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data:registrations:write
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+      responses:
+        '204':
+          description: Upon success, an empty response body shall be returned
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    patch:
+      summary: Modify the IP-SM-GW context data of a UE
+      operationId: ModifyIpSmGwContext
+      tags:
+        - IP-SM-GW Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data:registrations:write
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              type: array
+              items:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchItem'
+              minItems: 1
+        required: true
+      responses:
+        '204':
+          description: Successful response
+        '403':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/403'
+        '404':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/404'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    get:
+      summary: Retrieves the IP-SM-GW context data of a UE
+      operationId: QueryIpSmGwContext
+      tags:
+        - IP-SM-GW Registration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: fields
+          in: query
+          description: attributes to be retrieved
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            minItems: 1
+          style: form
+          explode: false
+        - name: supported-features
+          in: query
+          description: Supported Features
+          schema:
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      responses:
+        '200':
+          description: Expected response to a valid request
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
-                
+                $ref: '#/components/schemas/IpSmGwRegistration'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/{ueId}/context-data/mwd:
+    put:
+      summary: Create the Message Waiting Data of the UE
+      operationId: CreateMessageWaitingData
+      tags:
+        - Message Waiting Data (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageWaitingData'
+      responses:
+        '204':
+          description: Upon success, an empty response body shall be returned
+        default:
+          description: Unexpected error
+    delete:
+      summary: To remove the Message Waiting Data of the UE
+      operationId: DeleteMessageWaitingData
+      tags:
+        - Message Waiting Data (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+      responses:
+        '204':
+          description: Upon success, an empty response body shall be returned
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    patch:
+      summary: Modify the Message Waiting Data of the UE
+      operationId: ModifyMessageWaitingData
+      tags:
+        - Message Waiting Data (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              type: array
+              items:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchItem'
+              minItems: 1
+        required: true
+      responses:
+        '204':
+          description: Successful response
+        '403':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/403'
+        '404':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/404'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    get:
+      summary: Retrieves the Message Waiting Data of the UE
+      operationId: QueryMessageWaitingData
+      tags:
+        - Message Waiting Data (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: fields
+          in: query
+          description: attributes to be retrieved
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            minItems: 1
+          style: form
+          explode: false
+        - name: supported-features
+          in: query
+          description: Supported Features
+          schema:
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageWaitingData'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
   /subscription-data/{ueId}/{servingPlmnId}/provisioned-data/sms-mng-data:
     get:
       summary: Retrieves the SMS management subscription data of a UE
       operationId: QuerySmsMngData
       tags:
         - SMS Management Subscription Data (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: servingPlmnId
           in: path
           description: PLMN ID
@@ -1140,7 +2019,7 @@ paths:
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
         - name: If-None-Match
           in: header
           description: Validator for conditional requests, as described in RFC 7232, 3.2
@@ -1172,25 +2051,28 @@ paths:
               schema:
                 type: string
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
-                
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
   /subscription-data/{ueId}/{servingPlmnId}/provisioned-data/sms-data:
     get:
       summary: Retrieves the SMS subscription data of a UE
       operationId: QuerySmsData
       tags:
         - SMS Subscription Data (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: servingPlmnId
           in: path
           description: PLMN ID
@@ -1201,7 +2083,7 @@ paths:
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
         - name: If-None-Match
           in: header
           description: Validator for conditional requests, as described in RFC 7232, 3.2
@@ -1233,30 +2115,33 @@ paths:
               schema:
                 type: string
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
-                
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
   /subscription-data/{ueId}/pp-data:
     get:
       summary: Read the profile of a given UE
       operationId: GetppData
       tags:
       - Parameter Provision (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: pp data for a UE
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: supported-features
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
         - name: If-None-Match
           in: header
           description: Validator for conditional requests, as described in RFC 7232, 3.2
@@ -1292,67 +2177,85 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     patch:
       summary: modify the provisioned parameter data
       operationId: ModifyPpData
       tags:
         - ProvisionedParameterData (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: pp data for a UE
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: supported-features
+          in: query
+          description: Features required to be supported by the target NF
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
       requestBody:
         content:
           application/json-patch+json:
             schema:
               type: array
               items:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/PatchItem'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchItem'
         required: true
       responses:
         '204':
           description: Expected response to a valid request
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchResult'
         '403':
           description: modification is rejected
           content:
             application/problem+json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
-                
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
   /subscription-data/{ueId}/context-data/ee-subscriptions:
     get:
       summary: Retrieves the ee subscriptions of a UE
       operationId: Queryeesubscriptions
       tags:
         - Event Exposure Subscriptions (Collection)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: supported-features
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
       responses:
         '200':
           description: Expected response to a valid request
@@ -1363,23 +2266,27 @@ paths:
                items:
                 $ref: '#/components/schemas/EeSubscription'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     post:
       summary: Create individual EE subscription
       operationId: CreateEeSubscriptions
       tags:
         - Event Exposure Subscriptions (Collection)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE ID
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
       requestBody:
         content:
           application/json:
@@ -1395,29 +2302,32 @@ paths:
                 $ref: '#/components/schemas/EeSubscription'
           headers:
             Location:
-              description: 'Contains the URI of the newly created resource, according to the structure: {apiRoot}/subscription-data/{ueId}/context-data/ee-subscriptions/{subsId}'
+              description: 'Contains the URI of the newly created resource, according to the structure: {apiRoot}/nudr-dr/<apiVersion>/subscription-data/{ueId}/context-data/ee-subscriptions/{subsId}'
               required: true
               schema:
                 type: string
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
 
   /subscription-data/{ueId}/context-data/ee-subscriptions/{subsId}:
     put:
-      summary: Stores an individual ee subscriptions of a UE
+      summary: Update an individual ee subscriptions of a UE
       operationId: UpdateEesubscriptions
       tags:
         - Event Exposure Subscription (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: subsId
           in: path
           required: true
@@ -1431,23 +2341,33 @@ paths:
       responses:
         '204':
           description: Upon success, an empty response body shall be returned
-        default:
-          description: Unexpected error
+        '404':
+          description: update of non-existing resource is rejected
           content:
             application/problem+json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     delete:
       summary: Deletes a eeSubscription
       operationId: RemoveeeSubscriptions
       tags:
         - Event Exposure Subscription (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: subsId
           in: path
           required: true
@@ -1457,6 +2377,97 @@ paths:
       responses:
         '204':
           description: Expected response to a successful subscription removal
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    patch:
+      summary: Modify an individual ee subscription of a UE
+      operationId: ModifyEesubscription
+      tags:
+        - Event Exposure Subscription (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: subsId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: supported-features
+          in: query
+          description: Features required to be supported by the target NF
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              type: array
+              items:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchItem'
+              minItems: 1
+        required: true
+      responses:
+        '204':
+          description: Successful response
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchResult'
+        '403':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/403'
+        '404':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/404'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    get:
+      summary: Retrieve a eeSubscription
+      operationId: QueryeeSubscription
+      tags:
+        - Event Exposure Subscription (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: subsId
+          in: path
+          required: true
+          description: Unique ID of the subscription to remove
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+               items:
+                $ref: '#/components/schemas/EeSubscription'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
 
   /subscription-data/{ueId}/context-data/ee-subscriptions/{subsId}/amf-subscriptions:
     put:
@@ -1464,12 +2475,19 @@ paths:
       operationId: Create AMF Subscriptions
       tags:
         - AMF Subscription Info (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: subsId
           in: path
           required: true
@@ -1488,22 +2506,26 @@ paths:
         '204':
           description: Upon success, an empty response body shall be returned
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     delete:
       summary: Deletes AMF Subscription Info for an eeSubscription
       operationId: RemoveAmfSubscriptionsInfo
       tags:
         - Event AMF Subscription Info (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: subsId
           in: path
           required: true
@@ -1512,56 +2534,81 @@ paths:
       responses:
         '204':
           description: Expected response to a successful subscription removal
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     patch:
       summary: modify the AMF Subscription Info
       operationId: ModifyAmfSubscriptionInfo
       tags:
         - AmfSubscriptionInfo (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: subsId
           in: path
           required: true
           schema:
             type: string
+        - name: supported-features
+          in: query
+          description: Features required to be supported by the target NF
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
       requestBody:
         content:
           application/json-patch+json:
             schema:
               type: array
               items:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/PatchItem'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchItem'
         required: true
       responses:
         '204':
           description: Expected response to a valid request
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchResult'
         '403':
           description: modification is rejected
           content:
             application/problem+json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     get:
       summary: Retrieve AMF subscription Info
       operationId: GetAmfSubscriptionInfo
       tags:
         - Query AMF Subscription Info (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: subsId
           in: path
           required: true
@@ -1578,11 +2625,7 @@ paths:
                   $ref: '#/components/schemas/AmfSubscriptionInfo'
                 minItems: 1
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
 
   /subscription-data/group-data/{ueGroupId}/ee-subscriptions:
     get:
@@ -1590,6 +2633,13 @@ paths:
       operationId: QueryEeGroupSubscriptions
       tags:
         - Event Exposure Group Subscriptions (Collection)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueGroupId
           in: path
@@ -1601,7 +2651,7 @@ paths:
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
       responses:
         '200':
           description: Expected response to a valid request
@@ -1612,16 +2662,20 @@ paths:
                items:
                 $ref: '#/components/schemas/EeSubscription'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     post:
       summary: Create individual EE subscription for a group of UEs or any UE
       operationId: CreateEeGroupSubscriptions
       tags:
         - Event Exposure Group Subscriptions (Collection)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueGroupId
           in: path
@@ -1644,23 +2698,26 @@ paths:
                 $ref: '#/components/schemas/EeSubscription'
           headers:
             Location:
-              description: 'Contains the URI of the newly created resource, according to the structure: {apiRoot}/nudr-dr/v1/subscription-data/group-data/{ueGroupId}/ee-subscriptions '
+              description: 'Contains the URI of the newly created resource, according to the structure: {apiRoot}/nudr-dr/<apiVersion>/subscription-data/group-data/{ueGroupId}/ee-subscriptions'
               required: true
               schema:
                 type: string
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
 
   /subscription-data/group-data/{ueGroupId}/ee-subscriptions/{subsId}:
     put:
-      summary: Stores an individual ee subscription of a group of UEs or any UE
+      summary: Update an individual ee subscription of a group of UEs or any UE
       operationId: UpdateEeGroupSubscriptions
       tags:
-        - Event Exposure Subscription (Document)
+        - Event Exposure Group Subscription (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueGroupId
           in: path
@@ -1680,17 +2737,27 @@ paths:
       responses:
         '204':
           description: Upon success, an empty response body shall be returned
-        default:
-          description: Unexpected error
+        '404':
+          description: update of non-existing resource is rejected
           content:
             application/problem+json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     delete:
       summary: Deletes a eeSubscription for a group of UEs or any UE
       operationId: RemoveEeGroupSubscriptions
       tags:
-        - Event Exposure Subscription (Document)
+        - Event Exposure Group Subscription (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueGroupId
           in: path
@@ -1706,20 +2773,117 @@ paths:
       responses:
         '204':
           description: Expected response to a successful subscription removal
-         
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    patch:
+      summary: Modify an individual ee subscription for a group of a UEs
+      operationId: ModifyEeGroupSubscription
+      tags:
+        - Event Exposure Group Subscription (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueGroupId
+          in: path
+          required: true
+          schema:
+              $ref: '#/components/schemas/VarUeGroupId'
+        - name: subsId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: supported-features
+          in: query
+          description: Features required to be supported by the target NF
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              type: array
+              items:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchItem'
+              minItems: 1
+        required: true
+      responses:
+        '204':
+          description: Successful response
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchResult'
+        '403':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/403'
+        '404':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/404'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    get:
+      summary: Retrieve a individual eeSubscription for a group of UEs or any UE
+      operationId: QueryEeGroupSubscription
+      tags:
+        - Event Exposure Group Subscription (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueGroupId
+          in: path
+          required: true
+          schema:
+              $ref: '#/components/schemas/VarUeGroupId'
+        - name: subsId
+          in: path
+          required: true
+          description: Unique ID of the subscription to remove
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+               items:
+                $ref: '#/components/schemas/EeSubscription'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
   /subscription-data/{ueId}/ee-profile-data:
     get:
       summary: Retrieves the ee profile data of a UE
       operationId: QueryEEData
       tags:
         - Event Exposure Data (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: fields
           in: query
           description: attributes to be retrieved
@@ -1734,7 +2898,7 @@ paths:
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
       responses:
         '200':
           description: Expected response to a valid request
@@ -1743,31 +2907,33 @@ paths:
               schema:
                 $ref: '#/components/schemas/EeProfileData'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
 
-          
   /subscription-data/{ueId}/context-data/sdm-subscriptions:
     get:
       summary: Retrieves the sdm subscriptions of a UE
       operationId: Querysdmsubscriptions
       tags:
         - SDM Subscriptions (Collection)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: supported-features
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
       responses:
         '200':
           description: Expected response to a valid request
@@ -1778,23 +2944,27 @@ paths:
                items:
                 $ref: '#/components/schemas/SdmSubscription'
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     post:
       summary: Create individual sdm subscription
       operationId: CreateSdmSubscriptions
       tags:
         - SDM Subscriptions (Collection)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE ID
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
       requestBody:
         content:
           application/json:
@@ -1810,29 +2980,32 @@ paths:
                 $ref: '#/components/schemas/SdmSubscription'
           headers:
             Location:
-              description: 'Contains the URI of the newly created resource, according to the structure: {apiRoot}/subscription-data/{ueId}/context-data/sdm-subscriptions/{subsId}'
+              description: 'Contains the URI of the newly created resource, according to the structure: {apiRoot}/nudr-dr/<apiVersion>/subscription-data/{ueId}/context-data/sdm-subscriptions/{subsId}'
               required: true
               schema:
                 type: string
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
 
-  /subscription-data/{ueId}/context-data/sdm-subscriptions/{subsId}:  
+  /subscription-data/{ueId}/context-data/sdm-subscriptions/{subsId}:
     put:
-      summary: Stores an individual sdm subscriptions of a UE
+      summary: Update an individual sdm subscriptions of a UE
       operationId: Updatesdmsubscriptions
       tags:
         - SDM Subscription (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: subsId
           in: path
           required: true
@@ -1846,23 +3019,33 @@ paths:
       responses:
         '204':
           description: Upon success, an empty response body shall be returned
-        default:
-          description: Unexpected error
+        '404':
+          description: update of non-existing resource is rejected
           content:
             application/problem+json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
     delete:
       summary: Deletes a sdmsubscriptions
       operationId: RemovesdmSubscriptions
       tags:
         - SDM Subscription (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: subsId
           in: path
           required: true
@@ -1872,7 +3055,99 @@ paths:
       responses:
         '204':
           description: Expected response to a successful subscription removal
+        '404':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/404'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
 
+    patch:
+      summary: Modify an individual sdm subscription
+      operationId: ModifysdmSubscription
+      tags:
+        - SDM Subscription (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: subsId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: supported-features
+          in: query
+          description: Features required to be supported by the target NF
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              type: array
+              items:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchItem'
+              minItems: 1
+        required: true
+      responses:
+        '204':
+          description: Successful response
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchResult'
+        '403':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/403'
+        '404':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/404'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    get:
+      summary: Retrieves a individual sdmSubscription identified by subsId
+      operationId: QuerysdmSubscription
+      tags:
+        - SDM Subscription (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: subsId
+          in: path
+          required: true
+          description: Unique ID of the subscription to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SdmSubscription'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
 
   /subscription-data/shared-data:
     get:
@@ -1880,6 +3155,13 @@ paths:
       operationId: GetSharedData
       tags:
         - Retrieval of shared data
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: shared-data-ids
           in: query
@@ -1888,12 +3170,12 @@ paths:
           style: form
           explode: false
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_SDM.yaml#/components/schemas/SharedDataIds'
+             $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/SharedDataIds'
         - name: supportedFeatures
           in: query
           description: Supported Features
           schema:
-             $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
       responses:
         '200':
           description: Expected response to a valid request
@@ -1902,24 +3184,32 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_SDM.yaml#/components/schemas/SharedData'
+                  $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/SharedData'
                 minItems: 1
         '400':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/400'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/400'
         '404':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/404'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/404'
         '500':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/500'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/500'
         '503':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/503'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/503'
         default:
-          description: Unexpected error
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
   /subscription-data/subs-to-notify:
     post:
       summary: Subscription data subscriptions
       operationId: SubscriptionDataSubscriptions
       tags:
-        - Subs To Nofify (Collection)
+        - Subs To Notify (Collection)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       requestBody:
         content:
           application/json:
@@ -1935,16 +3225,12 @@ paths:
                 $ref: '#/components/schemas/SubscriptionDataSubscriptions'
           headers:
             Location:
-              description: 'Contains the URI of the newly created resource, according to the structure: {apiRoot}/subscription-data/subs-to-notify/{subsId}'
+              description: 'Contains the URI of the newly created resource, according to the structure: {apiRoot}/nudr-dr/<apiVersion>/subscription-data/subs-to-notify/{subsId}'
               required: true
               schema:
                 type: string
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
       callbacks:
         onDataChange:
           '{request.body#/callbackReference}':
@@ -1959,12 +3245,98 @@ paths:
                 '204':
                   description: Expected response to a valid request
 
-  /subscription-data/subs-to-notify/{subsId}:  
+    get:
+      summary: Retrieves the list of subscriptions
+      operationId: QuerySubsToNotify
+      tags:
+        - Subs To Notify (Collection)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ue-id
+          in: query
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: supported-features
+          in: query
+          description: Supported Features
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubscriptionDataSubscriptions'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    delete:
+      summary: Deletes subscriptions identified by a given ue-id parameter
+      operationId: RemoveMultipleSubscriptionDataSubscriptions
+      tags:
+        - Subs To Notify (Collection)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ue-id
+          in: query
+          required: true
+          description: UE ID
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: nf-instance-id
+          in: query
+          required: false
+          description: NF Instance ID
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/NfInstanceId'
+        - name: delete-all-nfs
+          in: query
+          required: false
+          description: Flag to delete subscriptions from all NFs
+          schema:
+            type: boolean
+        - name: implicit-unsubscribe-indication
+          in: query
+          required: false
+          description: Implicit Unsubscribe Indication
+          schema:
+            type: boolean
+      responses:
+        '204':
+          description: Expected response to a successful subscription removal
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/subs-to-notify/{subsId}:
     delete:
       summary: Deletes a subscriptionDataSubscriptions
       operationId: RemovesubscriptionDataSubscriptions
       tags:
         - Subs To Notify (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: subsId
           in: path
@@ -1975,6 +3347,86 @@ paths:
       responses:
         '204':
           description: Expected response to a successful subscription removal
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    patch:
+      summary: Modify an individual subscriptionDataSubscription
+      operationId: ModifysubscriptionDataSubscription
+      tags:
+        - Subs To Notify (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: subsId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: supported-features
+          in: query
+          description: Features required to be supported by the target NF
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              type: array
+              items:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchItem'
+              minItems: 1
+        required: true
+      responses:
+        '204':
+          description: Successful response
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchResult'
+        '403':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/403'
+        '404':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/404'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    get:
+      summary: Retrieves a individual subscriptionDataSubscription identified by subsId
+      operationId: QuerySubscriptionDataSubscriptions
+      tags:
+        - Subs To Notify (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: subsId
+          in: path
+          required: true
+          description: Unique ID of the subscription to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SubscriptionDataSubscriptions'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
 
   /subscription-data/{ueId}/{servingPlmnId}/provisioned-data/trace-data:
     get:
@@ -1982,13 +3434,20 @@ paths:
       operationId: QueryTraceData
       tags:
         - Trace Data (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE id
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         - name: servingPlmnId
           in: path
           description: PLMN ID
@@ -2011,7 +3470,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/TraceData'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/TraceData'
           headers:
             Cache-Control:
               description: Cache-Control containing max-age, as described in RFC 7234, 5.2
@@ -2026,20 +3485,35 @@ paths:
               schema:
                 type: string
         default:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/default'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
   /subscription-data/{ueId}/identity-data:
     get:
       summary: Retrieve identity data by SUPI or GPSI
       operationId: GetIdentityData
       tags:
         - Query Identity Data by SUPI or GPSI (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE ID
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: app-port-id
+          in: query
+          description: Application port identifier
+          content:
+            application/json:
+              schema:
+                $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/AppPortId'
         - name: If-None-Match
           in: header
           description: Validator for conditional requests, as described in RFC 7232, 3.2
@@ -2071,11 +3545,7 @@ paths:
               schema:
                 type: string
         default:
-          description: Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
 
   /subscription-data/{ueId}/operator-determined-barring-data:
     get:
@@ -2083,26 +3553,743 @@ paths:
       operationId: GetOdbData
       tags:
         - Query ODB Data by SUPI or GPSI (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
       parameters:
         - name: ueId
           in: path
           description: UE ID
           required: true
           schema:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OperatorDeterminedBarringData'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/OdbData'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/{ueId}/context-data:
+    get:
+      summary: Retrieve multiple context data sets of a UE
+      operationId: QueryContextData
+      tags:
+        - Context Data (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: context-dataset-names
+          in: query
+          description: List of context dataset names
+          style: form
+          explode: false
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContextDatasetNames'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContextDataSets'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/group-data/group-identifiers:
+    get:
+      summary: Mapping of Group Identifiers
+      operationId: GetGroupIdentifiers
+      tags:
+        - Group Identifiers
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ext-group-id
+          in: query
+          description: External Group Identifier
+          required: false
+          schema:
+            $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/ExtGroupId'
+        - name: int-group-id
+          in: query
+          description: Internal Group Identifier
+          required: false
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/GroupId'
+        - name: ue-id-ind
+          in: query
+          description: Indication whether UE identifiers are required or not
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: supported-features
+          in: query
+          description: Supported Features
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/GroupIdentifiers'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/group-data/5g-vn-groups:
+    get:
+      summary: Retrieves the data of a 5G VN Group
+      operationId: Query5GVnGroup
+      tags:
+        - 5G-VN-Groups (Store)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: gpsis
+          in: query
+          description: List of GPSIs
+          schema:
+            type: array
+            items:
+              $ref: 'TS29571_CommonData.yaml#/components/schemas/Gpsi'
+          style: form
+          explode: false
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+               type: object
+               description: A map(list of key-value pairs) where ExtGroupId serves as key
+               additionalProperties:
+                 $ref: 'TS29503_Nudm_PP.yaml#/components/schemas/5GVnGroupConfiguration'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/group-data/5g-vn-groups/{externalGroupId}:
+    put:
+      summary: Create an individual 5G VN Grouop
+      operationId: Create5GVnGroup
+      tags:
+        - 5GVnGroupConfiguration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: externalGroupId
+          in: path
+          required: true
+          schema:
+            $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/ExtGroupId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'TS29503_Nudm_PP.yaml#/components/schemas/5GVnGroupConfiguration'
+        required: true
+      responses:
+        '201':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: 'TS29503_Nudm_PP.yaml#/components/schemas/5GVnGroupConfiguration'
+        '403':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/403'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    delete:
+      summary: Deletes the 5GVnGroup
+      operationId: Delete5GVnGroup
+      tags:
+        - Delete 5GVnGroup
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: externalGroupId
+          in: path
+          required: true
+          schema:
+            $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/ExtGroupId'
+      responses:
+        '204':
+          description: Expected response to a successful group removal
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    patch:
+      summary: modify the 5GVnGroup
+      operationId: Modify5GVnGroup
+      tags:
+        - Modify 5GVnGroup
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: externalGroupId
+          in: path
+          required: true
+          schema:
+            $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/ExtGroupId'
+        - name: supported-features
+          in: query
+          description: Features required to be supported by the target NF
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              type: array
+              items:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchItem'
+        required: true
+      responses:
+        '204':
+          description: Expected response to a valid request
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/PatchResult'
+        '403':
+          description: modification is rejected
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+    get:
+      summary: Retrieve a 5GVnGroup configuration
+      operationId: Get5GVnGroupConfiguration
+      tags:
+        - Query 5GVnGroupConfiguration (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: externalGroupId
+          in: path
+          required: true
+          schema:
+            $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/ExtGroupId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'TS29503_Nudm_PP.yaml#/components/schemas/5GVnGroupConfiguration'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/{ueId}/lcs-privacy-data:
+    get:
+      summary: Retrieves the LCS Privacy subscription data of a UE
+      operationId: QueryLcsPrivacyData
+      tags:
+        - LCS Privacy Subscription Data
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: fields
+          in: query
+          description: attributes to be retrieved
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            minItems: 1
+          style: form
+          explode: false
+        - name: supported-features
+          in: query
+          description: Supported Features
+          schema:
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+        - name: If-None-Match
+          in: header
+          description: Validator for conditional requests, as described in RFC 7232, 3.2
+          schema:
+            type: string
+        - name: If-Modified-Since
+          in: header
+          description: Validator for conditional requests, as described in RFC 7232, 3.3
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LcsPrivacyData'
+          headers:
+            Cache-Control:
+              description: Cache-Control containing max-age, as described in RFC 7234, 5.2
+              schema:
+                type: string
+            ETag:
+              description: Entity Tag, containing a strong validator, as described in RFC 7232, 2.3
+              schema:
+                type: string
+            Last-Modified:
+              description: Timestamp for last modification of the resource, as described in RFC 7232, 2.2
+              schema:
+                type: string
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/{ueId}/lcs-mo-data:
+    get:
+      summary: Retrieves the LCS Mobile Originated subscription data of a UE
+      operationId: QueryLcsMoData
+      tags:
+        - LCS Mobile Originated Subscription Data
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: fields
+          in: query
+          description: attributes to be retrieved
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            minItems: 1
+          style: form
+          explode: false
+        - name: supported-features
+          in: query
+          description: Supported Features
+          schema:
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+        - name: If-None-Match
+          in: header
+          description: Validator for conditional requests, as described in RFC 7232, 3.2
+          schema:
+            type: string
+        - name: If-Modified-Since
+          in: header
+          description: Validator for conditional requests, as described in RFC 7232, 3.3
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LcsMoData'
+          headers:
+            Cache-Control:
+              description: Cache-Control containing max-age, as described in RFC 7234, 5.2
+              schema:
+                type: string
+            ETag:
+              description: Entity Tag, containing a strong validator, as described in RFC 7232, 2.3
+              schema:
+                type: string
+            Last-Modified:
+              description: Timestamp for last modification of the resource, as described in RFC 7232, 2.2
+              schema:
+                type: string
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/{ueId}/nidd-authorization-data:
+    get:
+      summary: Retrieve NIDD Authorization Data GPSI or External Group identifier
+      operationId: GetNiddAuData
+      tags:
+        - Query NIDD Authorization Data GPSI or External Group identifier (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE ID
+          required: true
+          schema:
+            type: string
+            pattern: '^(msisdn-[0-9]{5,15}|.+|extid-[^@]+@[^@]+|extgroupid-[^@]+@[^@]+)$'
+        - name: single-nssai
+          in: query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VarSnssai'
+          description: single NSSAI
+          required: true
+        - name: dnn
+          in: query
+          description: DNN
+          required: true
+          schema:
+            $ref: '#/components/schemas/Dnn'
+        - name: mtc-provider-information
+          in: query
+          description: MTC Provider Information
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/MtcProviderInformation'
+        - name: If-None-Match
+          in: header
+          description: Validator for conditional requests, as described in RFC 7232, 3.2
+          schema:
+            type: string
+        - name: If-Modified-Since
+          in: header
+          description: Validator for conditional requests, as described in RFC 7232, 3.3
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationData'
+          headers:
+            Cache-Control:
+              description: Cache-Control containing max-age, as described in RFC 7234, 5.2
+              schema:
+                type: string
+            ETag:
+              description: Entity Tag, containing a strong validator, as described in RFC 7232, 2.3
+              schema:
+                type: string
+            Last-Modified:
+              description: Timestamp for last modification of the resource, as described in RFC 7232, 2.2
+              schema:
+                type: string
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/{ueId}/coverage-restriction-data:
+    get:
+      summary: Retrieves the subscribed enhanced Coverage Restriction Data of a UE
+      operationId: QueryCoverageRestrictionData
+      tags:
+        - Enhanced Coverage Restriction Data
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: supported-features
+          in: query
+          description: Supported Features
+          schema:
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+        - name: If-None-Match
+          in: header
+          description: Validator for conditional requests, as described in RFC 7232, 3.2
+          schema:
+            type: string
+        - name: If-Modified-Since
+          in: header
+          description: Validator for conditional requests, as described in RFC 7232, 3.3
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnhancedCoverageRestrictionData'
+          headers:
+            Cache-Control:
+              description: Cache-Control containing max-age, as described in RFC 7234, 5.2
+              schema:
+                type: string
+            ETag:
+              description: Entity Tag, containing a strong validator, as described in RFC 7232, 2.3
+              schema:
+                type: string
+            Last-Modified:
+              description: Timestamp for last modification of the resource, as described in RFC 7232, 2.2
+              schema:
+                type: string
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/{ueId}/context-data/location:
+    get:
+      summary: Retrieves the UE's Location Information
+      operationId: QueryUeLocation
+      tags:
+        - UE's Location Information (Document)
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: supported-features
+          in: query
+          description: Supported Features
+          schema:
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationInfo'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/{ueId}/v2x-data:
+    get:
+      summary: Retrieves the subscribed V2X Data of a UE
+      operationId: QueryV2xData
+      tags:
+        - V2X Subscription Data
+      security:
+        - {}
+        - oAuth2ClientCredentials:
+          - nudr-dr
+        - oAuth2ClientCredentials:
+          - nudr-dr
+          - nudr-dr:subscription-data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: supported-features
+          in: query
+          description: Supported Features
+          schema:
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+        - name: If-None-Match
+          in: header
+          description: Validator for conditional requests, as described in RFC 7232, 3.2
+          schema:
+            type: string
+        - name: If-Modified-Since
+          in: header
+          description: Validator for conditional requests, as described in RFC 7232, 3.3
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2xSubscriptionData'
+          headers:
+            Cache-Control:
+              description: Cache-Control containing max-age, as described in RFC 7234, 5.2
+              schema:
+                type: string
+            ETag:
+              description: Entity Tag, containing a strong validator, as described in RFC 7232, 2.3
+              schema:
+                type: string
+            Last-Modified:
+              description: Timestamp for last modification of the resource, as described in RFC 7232, 2.2
+              schema:
+                type: string
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+  /subscription-data/{ueId}/{servingPlmnId}/provisioned-data/lcs-bca-data:
+    get:
+      summary: Retrieves the LCS Broadcast Assistance subscription data of a UE
+      operationId: QueryLcsBcaData
+      tags:
+        - LCS Broadcast Assistance Subscription Data
+      parameters:
+        - name: ueId
+          in: path
+          description: UE id
+          required: true
+          schema:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
+        - name: servingPlmnId
+          in: path
+          description: PLMN ID
+          required: true
+          schema:
+            $ref: '#/components/schemas/VarPlmnId'
+        - name: supported-features
+          in: query
+          description: Supported Features
+          schema:
+             $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+        - name: If-None-Match
+          in: header
+          description: Validator for conditional requests, as described in RFC 7232, 3.2
+          schema:
+            type: string
+        - name: If-Modified-Since
+          in: header
+          description: Validator for conditional requests, as described in RFC 7232, 3.3
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LcsBroadcastAssistanceTypesData'
+          headers:
+            Cache-Control:
+              description: Cache-Control containing max-age, as described in RFC 7234, 5.2
+              schema:
+                type: string
+            ETag:
+              description: Entity Tag, containing a strong validator, as described in RFC 7232, 2.3
+              schema:
+                type: string
+            Last-Modified:
+              description: Timestamp for last modification of the resource, as described in RFC 7232, 2.2
+              schema:
+                type: string
         default:
           description: Unexpected error
           content:
             application/problem+json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+
+  /subscription-data/group-data/5g-vn-groups/internal:
+    get:
+      summary: Retrieves the data of 5G VN Group
+      operationId: Query5GVnGroupInternal
+      tags:
+        - 5G-VN-Groups-Internal (Document)
+      parameters:
+        - name: internal-group-ids
+          in: query
+          description: List of Internal Group IDs
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: 'TS29571_CommonData.yaml#/components/schemas/GroupId'
+          style: form
+          explode: false
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+               type: object
+               description: A map (list of key-value pairs) where ExtGroupId serves as key
+               additionalProperties:
+                 $ref: 'TS29503_Nudm_PP.yaml#/components/schemas/5GVnGroupConfiguration'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
 
 components:
   schemas:
@@ -2110,220 +4297,72 @@ components:
       type: object
       required:
         - authenticationMethod
-        - permanentKey
-        - sequenceNumber
       properties:
         authenticationMethod:
           $ref: '#/components/schemas/AuthMethod'
-        permanentKey:
-          $ref: '#/components/schemas/PermanentKey'
+        encPermanentKey:
+          type: string
+        protectionParameterId:
+          type: string
         sequenceNumber:
           $ref: '#/components/schemas/SequenceNumber'
         authenticationManagementField:
-          $ref: '#/components/schemas/AuthenticationManagementField'
-        vectorAlgorithm:
-          $ref: '#/components/schemas/VectorAlgorithm'
-        milenage:
-          $ref: '#/components/schemas/Milenage'
-        tuak:
-          $ref: '#/components/schemas/Tuak'
-        opc:
-          $ref: '#/components/schemas/Opc'
-        topc:
-          $ref: '#/components/schemas/Topc'
-        sharedAuthenticationSubscriptionId:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_SDM.yaml#/components/schemas/SharedData'
-
-    SharedAuthenticationSubscription:
-      type: object
-      required:
-        - authenticationMethod
-        - vectorAlgorithm
-      properties:
-        authenticationManagementField:
-          $ref: '#/components/schemas/AuthenticationManagementField'
-        vectorAlgorithm:
-          $ref: '#/components/schemas/VectorAlgorithm'
-        milenage:
-          $ref: '#/components/schemas/Milenage'
-        tuak:
-          $ref: '#/components/schemas/Tuak'
-
-
-    PermanentKey:
-      type: object
-      required:
-        - permanentKeyValue
-        - encryptionKey
-        - encryptionAlgorithm
-      properties:
-        permanentKeyValue:
-          $ref: '#/components/schemas/PermanentKeyValue'
-        encryptionKey:
-          $ref: '#/components/schemas/EncryptionKey'
-        encryptionAlgorithm:
-          $ref: '#/components/schemas/EncryptionAlgorithm'
-
-
-    Milenage:
-      type: object
-      properties:
-        op:
-          $ref: '#/components/schemas/Op'
-        rotations:
-          $ref: '#/components/schemas/Rotations'
-        constants:
-          $ref: '#/components/schemas/Constants'
-
-    Tuak:
-      type: object
-      properties:
-        top:
-          $ref: '#/components/schemas/Top'
-        keccakIterations:
-          type: integer
-          minimum: 1
-          maximum: 255
-
-
-    Op:
-      type: object
-      required:
-        - opValue
-        - encryptionKey
-        - encryptionAlgorithm
-      properties:
-        opValue:
-          $ref: '#/components/schemas/OpValue'
-        encryptionKey:
-          $ref: '#/components/schemas/EncryptionKey'
-        encryptionAlgorithm:
-          $ref: '#/components/schemas/EncryptionAlgorithm'
-
-    Opc:
-      type: object
-      required:
-        - opcValue
-        - encryptionKey
-        - encryptionAlgorithm
-      properties:
-        opcValue:
-          $ref: '#/components/schemas/OpcValue'
-        encryptionKey:
-          $ref: '#/components/schemas/EncryptionKey'
-        encryptionAlgorithm:
-          $ref: '#/components/schemas/EncryptionAlgorithm'
-
-    Top:
-      type: object
-      required:
-        - topValue
-        - encryptionKey
-        - encryptionAlgorithm
-      properties:
-        topValue:
-          $ref: '#/components/schemas/TopValue'
-        encryptionKey:
-          $ref: '#/components/schemas/EncryptionKey'
-        encryptionAlgorithm:
-          $ref: '#/components/schemas/EncryptionAlgorithm'
-
-    Topc:
-      type: object
-      required:
-        - topcValue
-        - encryptionKey
-        - encryptionAlgorithm
-      properties:
-        topcValue:
-          $ref: '#/components/schemas/TopcValue'
-        encryptionKey:
-          $ref: '#/components/schemas/EncryptionKey'
-        encryptionAlgorithm:
-          $ref: '#/components/schemas/EncryptionAlgorithm'
-
-    Rotations:
-      type: object
-      required:
-        - r1
-        - r2
-        - r3
-        - r4
-        - r5
-      properties:
-        r1:
-          $ref: '#/components/schemas/RValue'
-        r2:
-          $ref: '#/components/schemas/RValue'
-        r3:
-          $ref: '#/components/schemas/RValue'
-        r4:
-          $ref: '#/components/schemas/RValue'
-        r5:
-          $ref: '#/components/schemas/RValue'
-
-    Constants:
-      type: object
-      required:
-        - c1
-        - c2
-        - c3
-        - c4
-        - c5
-      properties:
-        c1:
-          $ref: '#/components/schemas/CValue'
-        c2:
-          $ref: '#/components/schemas/CValue'
-        c3:
-          $ref: '#/components/schemas/CValue'
-        c4:
-          $ref: '#/components/schemas/CValue'
-        c5:
-          $ref: '#/components/schemas/CValue'
-
-    PermanentKeyValue:
-      type: string
-      pattern: '^[A-Fa-f0-9]+$'
+          type: string
+          pattern: '^[A-Fa-f0-9]{4}$'
+        algorithmId:
+          type: string
+        encOpcKey:
+          type: string
+        encTopcKey:
+          type: string
+        vectorGenerationInHss:
+          type: boolean
+          default: false
+        n5gcAuthMethod:
+          $ref: '#/components/schemas/AuthMethod'
+        rgAuthenticationInd:
+          type: boolean
+          default: false
+        supi:
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
     SequenceNumber:
-      type: string
-      pattern: '^[A-Fa-f0-9]{12}$'
-    AuthenticationManagementField:
-      type: string
-      pattern: '^[A-Fa-f0-9]{4}$'
-    OpValue:
-      type: string
-      pattern: '^[A-Fa-f0-9]+$'
-    OpcValue:
-      type: string
-      pattern: '^[A-Fa-f0-9]+$'
-    TopValue:
-      type: string
-      pattern: '^[A-Fa-f0-9]+$'
-    TopcValue:
-      type: string
-      pattern: '^[A-Fa-f0-9]+$'
-    RValue:
-      type: string
-      pattern: '^[A-Fa-f0-9]+$'
-    CValue:
-      type: string
-      pattern: '^[A-Fa-f0-9]+$'
-    EncryptionKey:
-      type: integer
-    EncryptionAlgorithm:
-      type: integer
-    VectorAlgorithm:
+      type: object
+      properties:
+        sqnScheme:
+          $ref: '#/components/schemas/SqnScheme'
+        sqn:
+          type: string
+          pattern: '^[A-Fa-f0-9]{12}$'
+        lastIndexes:
+          type: object
+          additionalProperties:
+            type: integer
+            minimum: 0
+        indLength:
+          type: integer
+          minimum: 0
+        difSign:
+          $ref: '#/components/schemas/Sign'
+
+    SqnScheme:
+      anyOf:
+        - type: string
+          enum:
+            - GENERAL
+            - NON_TIME_BASED
+            - TIME_BASED
+        - type: string
+    Sign:
       type: string
       enum:
-        - MILENAGE
-        - TUAK
+        - POSITIVE
+        - NEGATIVE
     VarPlmnId:
       type: string
       pattern: '^[0-9]{5,6}$'
     DatasetNames:
       type: array
-      items: 
+      items:
         $ref: '#/components/schemas/DataSetName'
       minItems: 1
       uniqueItems: true
@@ -2337,6 +4376,10 @@ components:
         - SM
         - TRACE
         - SMS_MNG
+        - LCS_PRIVACY
+        - LCS_MO
+        - LCS_BCA
+        - V2X
       - type: string
     ProvisionedDataSets:
       type: object
@@ -2352,64 +4395,95 @@ components:
           items:
             $ref: '#/components/schemas/SessionManagementSubscriptionData'
         traceData:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/TraceData'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/TraceData'
         smsMngData:
           $ref: '#/components/schemas/SmsManagementSubscriptionData'
+        lcsPrivacyData:
+          $ref: '#/components/schemas/LcsPrivacyData'
+        lcsMoData:
+          $ref: '#/components/schemas/LcsMoData'
+        lcsBcaData:
+          $ref: '#/components/schemas/LcsBroadcastAssistanceTypesData'
+        v2xData:
+          $ref: '#/components/schemas/V2xSubscriptionData'
     AccessAndMobilitySubscriptionData:
-      $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_SDM.yaml#/components/schemas/AccessAndMobilitySubscriptionData'
+      $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/AccessAndMobilitySubscriptionData'
     SmfSelectionSubscriptionData:
-      $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_SDM.yaml#/components/schemas/SmfSelectionSubscriptionData'
+      $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/SmfSelectionSubscriptionData'
     VarSnssai:
-      $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Snssai'
+      $ref: 'TS29571_CommonData.yaml#/components/schemas/Snssai'
     Dnn:
-      $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Dnn'
+      $ref: 'TS29571_CommonData.yaml#/components/schemas/Dnn'
     SessionManagementSubscriptionData:
-      $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_SDM.yaml#/components/schemas/SessionManagementSubscriptionData'
+      $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/SessionManagementSubscriptionData'
     Amf3GppAccessRegistration:
-      $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_UECM.yaml#/components/schemas/Amf3GppAccessRegistration'
+      $ref: 'TS29503_Nudm_UECM.yaml#/components/schemas/Amf3GppAccessRegistration'
     AmfNon3GppAccessRegistration:
-      $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_UECM.yaml#/components/schemas/AmfNon3GppAccessRegistration'
+      $ref: 'TS29503_Nudm_UECM.yaml#/components/schemas/AmfNon3GppAccessRegistration'
     SmfRegistration:
-      $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_UECM.yaml#/components/schemas/SmfRegistration'
+      $ref: 'TS29503_Nudm_UECM.yaml#/components/schemas/SmfRegistration'
     SmsfRegistration:
-      $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_UECM.yaml#/components/schemas/SmsfRegistration'
+      $ref: 'TS29503_Nudm_UECM.yaml#/components/schemas/SmsfRegistration'
+    LocationInfo:
+      $ref: 'TS29503_Nudm_UECM.yaml#/components/schemas/LocationInfo'
     SmsManagementSubscriptionData:
-      $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_SDM.yaml#/components/schemas/SmsManagementSubscriptionData'
+      $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/SmsManagementSubscriptionData'
     SmsSubscriptionData:
-      $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_SDM.yaml#/components/schemas/SmsSubscriptionData'
+      $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/SmsSubscriptionData'
+    LcsPrivacyData:
+      $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/LcsPrivacyData'
+    LcsMoData:
+      $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/LcsMoData'
+    AuthorizationData:
+      $ref: 'TS29503_Nudm_NIDDAU.yaml#/components/schemas/AuthorizationData'
+    EnhancedCoverageRestrictionData:
+      $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/EnhancedCoverageRestrictionData'
+    V2xSubscriptionData:
+      $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/V2xSubscriptionData'
+    LcsBroadcastAssistanceTypesData:
+      $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/LcsBroadcastAssistanceTypesData'
     OperatorSpecificDataContainer:
       type: object
+      required:
+        - dataType
+        - value
       properties:
-        StringTypeElements:
-          type: object
-          additionalProperties:
-            type: string
-        IntegerTypeElements:
-          type: object
-          additionalProperties:
-            type: integer
-        NumberTypeElements:
-          type: object
-          additionalProperties:
-            type: number
-        BooleanTypeElements:
-          type: object
-          additionalProperties:
-            type: boolean
+        dataType:
+          type: string
+          enum:
+            - string
+            - integer
+            - number
+            - boolean
+            - object
+        dataTypeDefinition:
+          type: string
+        value:
+          oneOf:
+            - type: string
+            - type: integer
+            - type: number
+            - type: boolean
+            - type: object
+        supportedFeatures:
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
     AuthMethod:
-      type: string
-      enum:
-        - 5G_AKA
-        - EAP_AKA_PRIME
+      anyOf:
+        - type: string
+          enum:
+            - 5G_AKA
+            - EAP_AKA_PRIME
+            - EAP_TLS
+        - type: string
     PpData:
-      $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_PP.yaml#/components/schemas/PpData'
+      $ref: 'TS29503_Nudm_PP.yaml#/components/schemas/PpData'
     EeSubscription:
-      $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_EE.yaml#/components/schemas/EeSubscription'
+      $ref: 'TS29503_Nudm_EE.yaml#/components/schemas/EeSubscription'
     VarUeGroupId:
       type: string
       pattern: '^(extgroupid-[^@]+@[^@]+|anyUE)$'
     SdmSubscription:
-      $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_SDM.yaml#/components/schemas/SdmSubscription'
+      $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/SdmSubscription'
     SmfRegList:
       type: array
       items:
@@ -2417,72 +4491,137 @@ components:
     SubscriptionDataSubscriptions:
       type: object
       required:
-        - ueId
+        - monitoredResourceUris
         - callbackReference
-        - originalCallbackReference
-        - supported-features
       properties:
         ueId:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         callbackReference:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Uri'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Uri'
         originalCallbackReference:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Uri'
-        monitoredResourceUri:
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Uri'
+        monitoredResourceUris:
           type: array
           items:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Uri'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Uri'
         expiry:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/DateTime'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/DateTime'
+        sdmSubscription:
+          $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/SdmSubscription'
+        subscriptionId:
+          type: string
+
         supported-features:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
     DataChangeNotify:
       type: object
       properties:
         originalCallbackReference:
           type: array
           items:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Uri'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Uri'
           minItems: 1
         ueId:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/VarUeId'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/VarUeId'
         notifyItems:
           type: array
           items:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/NotifyItem'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/NotifyItem'
           minItems: 1
+        sdmSubscription:
+          $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/SdmSubscription'
+        additionalSdmSubscriptions:
+          type: array
+          items:
+            $ref: 'TS29503_Nudm_SDM.yaml#/components/schemas/SdmSubscription'
+          minItems: 1
+        subscriptionDataSubscriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubscriptionDataSubscriptions'
+
     IdentityData:
       type: object
       properties:
         supiList:
           type: array
           items:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Supi'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
           minItems: 1
-          maxItems: 2
         gpsiList:
           type: array
           items:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Gpsi'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/Gpsi'
           minItems: 1
     SorData:
       type: object
       properties:
+        provisioningTime:
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/DateTime'
+        ueUpdateStatus:
+          $ref: '#/components/schemas/UeUpdateStatus'
         sorXmacIue:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29509_Nausf_SoRProtection.yaml#/components/schemas/SorMac'
+          $ref: 'TS29509_Nausf_SoRProtection.yaml#/components/schemas/SorMac'
+        sorMacIue:
+          $ref: 'TS29509_Nausf_SoRProtection.yaml#/components/schemas/SorMac'
       required:
-        - sorXmacIue
-    OperatorDeterminedBarringData:
-      $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/OdbData' 
+        - provisioningTime
+        - ueUpdateStatus
+
+    UpuData:
+      type: object
+      properties:
+        provisioningTime:
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/DateTime'
+        ueUpdateStatus:
+          $ref: '#/components/schemas/UeUpdateStatus'
+        upuXmacIue:
+          $ref: 'TS29509_Nausf_UPUProtection.yaml#/components/schemas/UpuMac'
+        upuMacIue:
+          $ref: 'TS29509_Nausf_UPUProtection.yaml#/components/schemas/UpuMac'
+      required:
+        - provisioningTime
+        - ueUpdateStatus
+
+    NssaiAckData:
+      type: object
+      properties:
+        provisioningTime:
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/DateTime'
+        ueUpdateStatus:
+          $ref: '#/components/schemas/UeUpdateStatus'
+      required:
+        - provisioningTime
+        - ueUpdateStatus
+
+    CagAckData:
+      type: object
+      properties:
+        provisioningTime:
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/DateTime'
+        ueUpdateStatus:
+          $ref: '#/components/schemas/UeUpdateStatus'
+      required:
+        - provisioningTime
+        - ueUpdateStatus
+
+    UeUpdateStatus:
+      type: string
+      enum:
+        - NOT_SENT
+        - SENT_NO_ACK_REQUIRED
+        - WAITING_FOR_ACK
+        - ACK_RECEIVED
+
     EeProfileData:
       type: object
       properties:
         restrictedEventTypes:
           type: array
           items:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29503_Nudm_EE.yaml#/components/schemas/EventType'
+            $ref: 'TS29503_Nudm_EE.yaml#/components/schemas/EventType'
         supportedFeatures:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
     AmfSubscriptionInfo:
       type: object
       required:
@@ -2490,8 +4629,81 @@ components:
         - subscriptionId
       properties:
         amfInstanceId:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/NfInstanceId'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/NfInstanceId'
         subscriptionId:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Uri'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Uri'
         subsChangeNotifyCorrelationId:
           type: string
+    ContextDatasetNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/ContextDataSetName'
+      minItems: 2
+      uniqueItems: true
+    ContextDataSetName:
+      anyOf:
+      - type: string
+        enum:
+        - AMF_3GPP
+        - AMF_NON_3GPP
+        - SDM_SUBSCRIPTIONS
+        - EE_SUBSCRIPTIONS
+        - SMSF_3GPP
+        - SMSF_NON_3GPP
+        - SUBS_TO_NOTIFY
+        - SMF_REG
+        - IP_SM_GW
+      - type: string
+    ContextDataSets:
+      type: object
+      properties:
+        amf3Gpp:
+          $ref: '#/components/schemas/Amf3GppAccessRegistration'
+        amfNon3Gpp:
+          $ref: '#/components/schemas/AmfNon3GppAccessRegistration'
+        sdmSubscriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SdmSubscription'
+          minItems: 1
+        eeSubscriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/EeSubscription'
+          minItems: 1
+        smsf3GppAccess:
+          $ref: '#/components/schemas/SmsfRegistration'
+        smsfNon3GppAccess:
+          $ref: '#/components/schemas/SmsfRegistration'
+        subscriptionDataSubscriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubscriptionDataSubscriptions'
+          minItems: 1
+        smfRegistrations:
+          $ref: '#/components/schemas/SmfRegList'
+        ipSmGw:
+          $ref: '#/components/schemas/IpSmGwRegistration'
+
+    IpSmGwRegistration:
+      $ref: 'TS29503_Nudm_UECM.yaml#/components/schemas/IpSmGwRegistration'
+
+    MessageWaitingData:
+      type: object
+      properties:
+        mwdList:
+          type: array
+          items:
+            $ref: '#/components/schemas/SmscData'
+          minItems: 1
+
+    SmscData:
+      type: object
+      anyOf:
+        - required: [ smscMapAddress ]
+        - required: [ smscDiameterAddress ]
+      properties:
+        smscMapAddress:
+          $ref: 'TS29503_Nudm_UECM.yaml#/components/schemas/E164Number'
+        smscDiameterAddress:
+          $ref: 'TS29503_Nudm_UECM.yaml#/components/schemas/NetworkNodeDiameterAddress'

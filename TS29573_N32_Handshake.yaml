@@ -1,24 +1,26 @@
 openapi: 3.0.0
 
 info:
-  version: '1.0.0'
+  version: '1.1.2'
   title: 'N32 Handshake API'
-  description: 'N32-c Handshake'
-
+  description: |
+   N32-c Handshake Service.
+    © 2020, 3GPP Organizational Partners (ARIB, ATIS, CCSA, ETSI, TSDSI, TTA, TTC).
+    All rights reserved.
 servers:
   - url: '{apiRoot}/n32c-handshake/v1'
     variables:
       apiRoot:
         default: https://example.com
-        description:  apiRoot as defined in subclause 4.4 of 3GPP TS 29.501.
+        description:  apiRoot as defined in clause 4.4 of 3GPP TS 29.501.
 externalDocs:
-  description: 3GPP TS 29.573 V15.1.0; 5G System; Public Land Mobile Network (PLMN) Interconnection; Stage 3
+  description: 3GPP TS 29.573 V16.5.0; 5G System; Public Land Mobile Network (PLMN) Interconnection; Stage 3
   url: http://www.3gpp.org/ftp/Specs/archive/29_series/29.573/
 
 paths:
   /exchange-capability:
     post:
-      summary:  Security Capability Negotiation 
+      summary:  Security Capability Negotiation
       tags:
         - Security Capability Negotiation
       operationId: PostExchangeCapability
@@ -36,20 +38,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SecNegotiateRspData'
-        '400': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/400'
-        '411': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/411'
-        '413': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/413'
-        '415': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/415'
+        '400':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/400'
+        '411':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/411'
+        '413':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/413'
+        '415':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/415'
         '429':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/429'
-        '500': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/500'
-        '503': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/503'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/429'
+        '500':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/500'
+        '503':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/503'
         default:
           description: Unexpected error
   /exchange-params:
@@ -72,20 +74,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SecParamExchRspData'
-        '400': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/400'
-        '411': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/411'
-        '413': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/413'
-        '415': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/415'
+        '400':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/400'
+        '409':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/409'
+        '411':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/411'
+        '413':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/413'
+        '415':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/415'
         '429':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/429'
-        '500': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/500'
-        '503': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/503'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/429'
+        '500':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/500'
+        '503':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/503'
         default:
           description: Unexpected error
   /n32f-terminate:
@@ -108,20 +112,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/N32fContextInfo'
-        '400': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/400'
-        '411': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/411'
-        '413': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/413'
-        '415': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/415'
+        '400':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/400'
+        '411':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/411'
+        '413':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/413'
+        '415':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/415'
         '429':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/429'
-        '500': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/500'
-        '503': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/503'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/429'
+        '500':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/500'
+        '503':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/503'
         default:
           description: Unexpected error
   /n32f-error:
@@ -140,20 +144,20 @@ paths:
       responses:
         '204':
           description: successful error reporting
-        '400': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/400'
-        '411': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/411'
-        '413': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/413'
-        '415': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/415'
+        '400':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/400'
+        '411':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/411'
+        '413':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/413'
+        '415':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/415'
         '429':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/429'
-        '500': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/500'
-        '503': 
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/503'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/429'
+        '500':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/500'
+        '503':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/503'
         default:
           description: Unexpected error
 components:
@@ -163,11 +167,11 @@ components:
         - type: string
           enum:
             - TLS
-            - ALS
+            - PRINS
         - type: string
     ApiSignature:
       oneOf:
-        - $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Uri'
+        - $ref: 'TS29571_CommonData.yaml#/components/schemas/Uri'
         - $ref: '#/components/schemas/CallbackName'
     HttpMethod:
       anyOf:
@@ -182,8 +186,8 @@ components:
             - OPTIONS
             - CONNECT
             - TRACE
-        - type: string    
-    
+        - type: string
+
     IeType:
       anyOf:
         - type: string
@@ -196,7 +200,7 @@ components:
             - OTHER
             - NONSENSITIVE
         - type: string
-    
+
     IeLocation:
       anyOf:
         - type: string
@@ -206,7 +210,7 @@ components:
             - BODY
             - MULTIPART_BINARY
         - type: string
-    
+
     IeInfo:
       type: object
       required:
@@ -223,7 +227,12 @@ components:
           type: string
         isModifiable:
           type: boolean
-  
+        isModifiableByIpx:
+          type: object
+          additionalProperties:
+            type: boolean
+          minProperties: 1
+
     ApiIeMapping:
       type: object
       required:
@@ -240,7 +249,7 @@ components:
           items:
             $ref: '#/components/schemas/IeInfo'
           minItems: 1
-  
+
     ProtectionPolicy:
       type: object
       required:
@@ -264,11 +273,19 @@ components:
         - supportedSecCapabilityList
       properties:
         sender:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29510_Nnrf_NFManagement.yaml#/components/schemas/Fqdn'
+          $ref: 'TS29510_Nnrf_NFManagement.yaml#/components/schemas/Fqdn'
         supportedSecCapabilityList:
           type: array
           items:
             $ref: '#/components/schemas/SecurityCapability'
+          minItems: 1
+        3GppSbiTargetApiRootSupported:
+          type: boolean
+          default: false
+        plmnIdList:
+          type: array
+          items:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/PlmnId'
           minItems: 1
 
     SecNegotiateRspData:
@@ -278,10 +295,18 @@ components:
         - selectedSecCapability
       properties:
         sender:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29510_Nnrf_NFManagement.yaml#/components/schemas/Fqdn'
+          $ref: 'TS29510_Nnrf_NFManagement.yaml#/components/schemas/Fqdn'
         selectedSecCapability:
           $ref: '#/components/schemas/SecurityCapability'
-  
+        3GppSbiTargetApiRootSupported:
+          type: boolean
+          default: false
+        plmnIdList:
+          type: array
+          items:
+            $ref: 'TS29571_CommonData.yaml#/components/schemas/PlmnId'
+          minItems: 1
+
     SecParamExchReqData:
       type: object
       required:
@@ -289,9 +314,10 @@ components:
       properties:
         n32fContextId:
           type: string
+          pattern: '^[A-Fa-f0-9]{16}$'
         jweCipherSuiteList:
           type: array
-          items: 
+          items:
             type: string
           minItems: 1
         jwsCipherSuiteList:
@@ -301,7 +327,14 @@ components:
           minItems: 1
         protectionPolicyInfo:
           $ref: '#/components/schemas/ProtectionPolicy'
-          
+        ipxProviderSecInfoList:
+          type: array
+          items:
+            $ref: '#/components/schemas/IpxProviderSecInfo'
+          minItems: 1
+        sender:
+          $ref: 'TS29510_Nnrf_NFManagement.yaml#/components/schemas/Fqdn'
+
     SecParamExchRspData:
       type: object
       required:
@@ -309,13 +342,21 @@ components:
       properties:
         n32fContextId:
           type: string
+          pattern: '^[A-Fa-f0-9]{16}$'
         selectedJweCipherSuite:
           type: string
         selectedJwsCipherSuite:
           type: string
         selProtectionPolicyInfo:
           $ref: '#/components/schemas/ProtectionPolicy'
-    
+        ipxProviderSecInfoList:
+          type: array
+          items:
+            $ref: '#/components/schemas/IpxProviderSecInfo'
+          minItems: 1
+        sender:
+          $ref: 'TS29510_Nnrf_NFManagement.yaml#/components/schemas/Fqdn'
+
     N32fContextInfo:
       type: object
       required:
@@ -323,6 +364,7 @@ components:
       properties:
         n32fContextId:
           type: string
+          pattern: '^[A-Fa-f0-9]{16}$'
     CallbackName:
       type: object
       required:
@@ -357,7 +399,7 @@ components:
         - n32fErrorType
       properties:
         ipxId:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29510_Nnrf_NFManagement.yaml#/components/schemas/Fqdn'
+          $ref: 'TS29510_Nnrf_NFManagement.yaml#/components/schemas/Fqdn'
         n32fErrorType:
           $ref: '#/components/schemas/N32fErrorType'
     N32fErrorDetail:
@@ -370,6 +412,23 @@ components:
           type: string
         msgReconstructFailReason:
           $ref: '#/components/schemas/FailureReason'
+    IpxProviderSecInfo:
+      type: object
+      required:
+        - ipxProviderId
+      properties:
+        ipxProviderId:
+          $ref: 'TS29510_Nnrf_NFManagement.yaml#/components/schemas/Fqdn'
+        rawPublicKeyList:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        certificateList:
+          type: array
+          items:
+            type: string
+          minItems: 1
     N32fErrorType:
       anyOf:
         - type: string
@@ -379,6 +438,10 @@ components:
             - MODIFICATIONS_INSTRUCTIONS_FAILED
             - DECIPHERING_FAILED
             - MESSAGE_RECONSTRUCTION_FAILED
+            - CONTEXT_NOT_FOUND
+            - INTEGRITY_KEY_EXPIRED
+            - ENCRYPTION_KEY_EXPIRED
+            - POLICY_MISMATCH
         - type: string
     FailureReason:
       anyOf:

@@ -1,22 +1,24 @@
 openapi: 3.0.0
 info:
-  version: 1.0.0
+  version: 1.1.2
   title: Namf_Location
-  description: AMF Location Service
+  description: |
+    AMF Location Service
+    © 2020, 3GPP Organizational Partners (ARIB, ATIS, CCSA, ETSI, TSDSI, TTA, TTC).
+    All rights reserved.
 security:
   - {}
-  - oAuth2Clientcredentials:
+  - oAuth2ClientCredentials:
       - namf-loc
 externalDocs:
-  description: 3GPP TS 29.518 V15.2.0; 5G System; Access and Mobility Management Services
+  description: 3GPP TS 29.518 V16.6.0; 5G System; Access and Mobility Management Services
   url: 'http://www.3gpp.org/ftp/Specs/archive/29_series/29.518/'
 servers:
   - url: '{apiRoot}/namf-loc/v1'
     variables:
       apiRoot:
         default: https://example.com
-        description: apiRoot as defined in subclause subclause 4.4 of 3GPP TS 29.501
-
+        description: apiRoot as defined in clause clause 4.4 of 3GPP TS 29.501
 paths:
   /{ueContextId}/provide-pos-info:
     post:
@@ -31,7 +33,7 @@ paths:
           required: true
           schema:
             type: string
-            pattern: '^(imsi-[0-9]{5,15}|nai-.+|imei-[0-9]{15}|imeisv-[0-9]{16}|.+)$'
+            pattern: '^(imsi-[0-9]{5,15}|nai-.+|gli-.+|gci-.+|imei-[0-9]{15}|imeisv-[0-9]{16}|.+)$'
       requestBody:
         content:
           application/json:
@@ -45,24 +47,58 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProvidePosInfo'
+        '204':
+           description: Successful accept of location request with no information returned.
+        '307':
+          description: temporary redirect
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          headers:
+            Location:
+              description: 'An alternative URI of the resource located on an alternative service instance within the same AMF or AMF (service) set'
+              required: true
+              schema:
+                type: string
+            3gpp-Sbi-Target-Nf-Id:
+              description: ' Identifier of the target NF (service) instance ID towards which the request is redirected'
+              schema:
+                type: string
+        '308':
+          description: permanent redirect
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          headers:
+            Location:
+              description: 'An alternative URI of the resource located on an alternative service instance within the same AMF or AMF (service) set'
+              required: true
+              schema:
+                type: string
+            3gpp-Sbi-Target-Nf-Id:
+              description: ' Identifier of the target NF (service) instance ID towards which the request is redirected'
+              schema:
+                type: string
         '400':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/400'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/400'
         '403':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/403'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/403'
         '411':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/411'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/411'
         '413':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/413'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/413'
         '415':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/415'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/415'
         '429':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/429'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/429'
         '500':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/500'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/500'
         '503':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/503'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/503'
         '504':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/504'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/504'
         default:
           description: Unexpected error
       callbacks:
@@ -78,22 +114,54 @@ paths:
               responses:
                 '204':
                   description: Expected response to a successful callback processing
+                '307':
+                  description: temporary redirect
+                  content:
+                    application/problem+json:
+                      schema:
+                        $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                  headers:
+                    Location:
+                      description: 'An alternative URI of the NF service consumer to which the notification should be sent'
+                      required: true
+                      schema:
+                        type: string
+                    3gpp-Sbi-Target-Nf-Id:
+                      description: ' Identifier of the target NF (service) instance ID towards which the request is redirected'
+                      schema:
+                        type: string
+                '308':
+                  description: permanent redirect
+                  content:
+                    application/problem+json:
+                      schema:
+                        $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+                  headers:
+                    Location:
+                      description: 'An alternative URI of the NF service consumer to which the notification should be sent'
+                      required: true
+                      schema:
+                        type: string
+                    3gpp-Sbi-Target-Nf-Id:
+                      description: ' Identifier of the target NF (service) instance ID towards which the request is redirected'
+                      schema:
+                        type: string
                 '400':
-                  $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/400'
+                  $ref: 'TS29571_CommonData.yaml#/components/responses/400'
                 '403':
-                  $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/403'
+                  $ref: 'TS29571_CommonData.yaml#/components/responses/403'
                 '411':
-                  $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/411'
+                  $ref: 'TS29571_CommonData.yaml#/components/responses/411'
                 '413':
-                  $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/413'
+                  $ref: 'TS29571_CommonData.yaml#/components/responses/413'
                 '415':
-                  $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/415'
+                  $ref: 'TS29571_CommonData.yaml#/components/responses/415'
                 '429':
-                  $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/429'
+                  $ref: 'TS29571_CommonData.yaml#/components/responses/429'
                 '500':
-                  $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/500'
+                  $ref: 'TS29571_CommonData.yaml#/components/responses/500'
                 '503':
-                  $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/503'
+                  $ref: 'TS29571_CommonData.yaml#/components/responses/503'
   /{ueContextId}/provide-loc-info:
     post:
       summary: Namf_Location ProvideLocationInfo service Operation
@@ -107,7 +175,7 @@ paths:
           required: true
           schema:
             type: string
-            pattern: '^(imsi-[0-9]{5,15}|nai-.+|imei-[0-9]{15}|imeisv-[0-9]{16}|.+)$'
+            pattern: '^(imsi-[0-9]{5,15}|nai-.+|gli-.+|gci-.+|imei-[0-9]{15}|imeisv-[0-9]{16}|.+)$'
       requestBody:
         content:
           application/json:
@@ -121,32 +189,146 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProvideLocInfo'
+        '307':
+          description: temporary redirect
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          headers:
+            Location:
+              description: 'An alternative URI of the resource located on an alternative service instance within the same AMF or AMF (service) set'
+              required: true
+              schema:
+                type: string
+            3gpp-Sbi-Target-Nf-Id:
+              description: ' Identifier of the target NF (service) instance ID towards which the request is redirected'
+              schema:
+                type: string
+        '308':
+          description: permanent redirect
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          headers:
+            Location:
+              description: 'An alternative URI of the resource located on an alternative service instance within the same AMF or AMF (service) set'
+              required: true
+              schema:
+                type: string
+            3gpp-Sbi-Target-Nf-Id:
+              description: ' Identifier of the target NF (service) instance ID towards which the request is redirected'
+              schema:
+                type: string
         '400':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/400'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/400'
         '403':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/403'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/403'
         '404':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/404'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/404'
         '411':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/411'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/411'
         '413':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/413'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/413'
         '415':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/415'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/415'
         '429':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/429'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/429'
         '500':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/500'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/500'
         '503':
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/responses/503'
+          $ref: 'TS29571_CommonData.yaml#/components/responses/503'
         default:
           description: Unexpected error
+
+  /{ueContextId}/cancel-pos-info:
+    post:
+      summary: Namf_Location CancelLocation service operation
+      tags:
+        - Individual UE context (Document)
+      operationId: CancelLocation
+      parameters:
+        - name: ueContextId
+          in: path
+          description: UE Context Identifier
+          required: true
+          schema:
+            type: string
+            pattern: '^(imsi-[0-9]{5,15}|nai-.+|gli-.+|gci-.+|.+)$'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelPosInfo'
+        required: true
+      responses:
+        '204':
+          description: Expected response to a successful cancellation
+        '307':
+          description: temporary redirect
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          headers:
+            Location:
+              description: 'An alternative URI of the resource located on an alternative service instance within the same AMF or AMF (service) set'
+              required: true
+              schema:
+                type: string
+            3gpp-Sbi-Target-Nf-Id:
+              description: ' Identifier of the target NF (service) instance ID towards which the request is redirected'
+              schema:
+                type: string
+        '308':
+          description: permanent redirect
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'TS29571_CommonData.yaml#/components/schemas/ProblemDetails'
+          headers:
+            Location:
+              description: 'An alternative URI of the resource located on an alternative service instance within the same AMF or AMF (service) set'
+              required: true
+              schema:
+                type: string
+            3gpp-Sbi-Target-Nf-Id:
+              description: ' Identifier of the target NF (service) instance ID towards which the request is redirected'
+              schema:
+                type: string
+        '400':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/400'
+        '401':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/401'
+        '403':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/403'
+        '404':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/404'
+        '411':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/411'
+        '413':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/413'
+        '415':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/415'
+        '429':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/429'
+        '500':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/500'
+        '503':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/503'
+        '504':
+          $ref: 'TS29571_CommonData.yaml#/components/responses/504'
+        default:
+          $ref: 'TS29571_CommonData.yaml#/components/responses/default'
+
+
 components:
   securitySchemes:
     oAuth2ClientCredentials:
       type: oauth2
-      flows: 
-        clientCredentials: 
+      flows:
+        clientCredentials:
           tokenUrl: '{nrfApiRoot}/oauth2/token'
           scopes:
             namf-loc: Access to the Namf_Location API
@@ -155,25 +337,56 @@ components:
       type: object
       properties:
         lcsClientType:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/ExternalClientType'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/ExternalClientType'
         lcsLocation:
           $ref: '#/components/schemas/LocationType'
         supi:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Supi'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
         gpsi:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Gpsi'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Gpsi'
         priority:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/LcsPriority'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/LcsPriority'
         lcsQoS:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/LocationQoS'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/LocationQoS'
         velocityRequested:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/VelocityRequested'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/VelocityRequested'
         lcsSupportedGADShapes:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/SupportedGADShapes'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/SupportedGADShapes'
+        additionalLcsSuppGADShapes:
+          type: array
+          items:
+            $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/SupportedGADShapes'
+          minItems: 1
         locationNotificationUri:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Uri'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Uri'
         supportedFeatures:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+        oldGuami:
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Guami'
+        pei:
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Pei'
+        lcsServiceType:
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/LcsServiceType'
+        ldrType:
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/LdrType'
+        hgmlcCallBackURI:
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Uri'
+        ldrReference:
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/LdrReference'
+        periodicEventInfo:
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/PeriodicEventInfo'
+        areaEventInfo:
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/AreaEventInfo'
+        motionEventInfo:
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/MotionEventInfo'
+        externalClientIdentification:
+          $ref: 'TS29515_Ngmlc_Location.yaml#/components/schemas/ExternalClientIdentification'
+        afID:
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/NfInstanceId'
+        codeWord:
+          $ref: 'TS29515_Ngmlc_Location.yaml#/components/schemas/CodeWord'
+        uePrivacyRequirements:
+          $ref: 'TS29515_Ngmlc_Location.yaml#/components/schemas/UePrivacyRequirements'
       required:
         - lcsClientType
         - lcsLocation
@@ -181,80 +394,92 @@ components:
       type: object
       properties:
         locationEstimate:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/GeographicArea'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/GeographicArea'
         accuracyFulfilmentIndicator:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/AccuracyFulfilmentIndicator'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/AccuracyFulfilmentIndicator'
         ageOfLocationEstimate:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/AgeOfLocationEstimate'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/AgeOfLocationEstimate'
         velocityEstimate:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/VelocityEstimate'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/VelocityEstimate'
         positioningDataList:
           type: array
           items:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/PositioningMethodAndUsage'
+            $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/PositioningMethodAndUsage'
           minItems: 0
           maxItems: 9
         gnssPositioningDataList:
           type: array
           items:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/GnssPositioningMethodAndUsage'
+            $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/GnssPositioningMethodAndUsage'
           minItems: 0
           maxItems: 9
         ecgi:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Ecgi'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Ecgi'
         ncgi:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Ncgi'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Ncgi'
         targetServingNode:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/NfInstanceId'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/NfInstanceId'
         civicAddress:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/CivicAddress'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/CivicAddress'
         barometricPressure:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/BarometricPressure'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/BarometricPressure'
         altitude:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/Altitude'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/Altitude'
         supportedFeatures:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+        servingLMFIdentification:
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/LMFIdentification'
+        locationPrivacyVerResult:
+          $ref: '#/components/schemas/LocationPrivacyVerResult'
     NotifiedPosInfo:
       type: object
       properties:
         locationEvent:
           $ref: '#/components/schemas/LocationEvent'
         supi:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Supi'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
         gpsi:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Gpsi'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Gpsi'
         pei:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Pei'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Pei'
         locationEstimate:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/GeographicArea'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/GeographicArea'
         ageOfLocationEstimate:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/AgeOfLocationEstimate'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/AgeOfLocationEstimate'
         velocityEstimate:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/VelocityEstimate'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/VelocityEstimate'
         positioningDataList:
           type: array
           items:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/PositioningMethodAndUsage'
+            $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/PositioningMethodAndUsage'
           minItems: 0
           maxItems: 9
         gnssPositioningDataList:
           type: array
           items:
-            $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/GnssPositioningMethodAndUsage'
+            $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/GnssPositioningMethodAndUsage'
           minItems: 0
           maxItems: 9
         ecgi:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Ecgi'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Ecgi'
         ncgi:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/Ncgi'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Ncgi'
         servingNode:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/NfInstanceId'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/NfInstanceId'
         civicAddress:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/CivicAddress'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/CivicAddress'
         barometricPressure:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/BarometricPressure'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/BarometricPressure'
         altitude:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/Altitude'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/Altitude'
+        hgmlcCallBackURI:
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Uri'
+        ldrReference:
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/LdrReference'
+        servingLMFIdentification:
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/LMFIdentification'
+        terminationCause:
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/TerminationCause'
       required:
         - locationEvent
     RequestLocInfo:
@@ -273,31 +498,51 @@ components:
           type: boolean
           default: false
         supportedFeatures:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
     ProvideLocInfo:
       type: object
       properties:
         currentLoc:
           type: boolean
         location:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/UserLocation'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/UserLocation'
         geoInfo:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/GeographicArea'
-        locatoinAge:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29572_Nlmf_Location.yaml#/components/schemas/AgeOfLocationEstimate'
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/GeographicArea'
+        locationAge:
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/AgeOfLocationEstimate'
         ratType:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/RatType'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/RatType'
         timezone:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/TimeZone'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/TimeZone'
         supportedFeatures:
-          $ref: 'https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+        oldGuami:
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Guami'
+    CancelPosInfo:
+      type: object
+      properties:
+        supi:
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Supi'
+        hgmlcCallBackURI:
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/Uri'
+        ldrReference:
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/LdrReference'
+        servingLMFIdentification:
+          $ref: 'TS29572_Nlmf_Location.yaml#/components/schemas/LMFIdentification'
+        supportedFeatures:
+          $ref: 'TS29571_CommonData.yaml#/components/schemas/SupportedFeatures'
+      required:
+        - supi
+        - hgmlcCallBackURI
+        - ldrReference
     LocationType:
       anyOf:
       - type: string
         enum:
           - CURRENT_LOCATION
           - CURRENT_OR_LAST_KNOWN_LOCATION
-          - INITIAL_LOCATION
+          - NOTIFICATION_VERIFICATION_ONLY
+          - DEFERRED_LOCATION
       - type: string
     LocationEvent:
       anyOf:
@@ -306,4 +551,16 @@ components:
           - EMERGENCY_CALL_ORIGINATION
           - EMERGENCY_CALL_RELEASE
           - EMERGENCY_CALL_HANDOVER
+          - ACTIVATION_OF_DEFERRED_LOCATION
+          - UE_MOBILITY_FOR_DEFERRED_LOCATION
+          - CANCELLATION_OF_DEFERRED_LOCATION
+      - type: string
+
+    LocationPrivacyVerResult:
+      anyOf:
+      - type: string
+        enum:
+          - LOCATION_ALLOWED
+          - LOCATION_NOT_ALLOWED
+          - RESPONSE_TIME_OUT
       - type: string
